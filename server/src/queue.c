@@ -1,36 +1,39 @@
 #include "../inc/server.h"
 #include "../inc/queue.h"
 
-int add_to_queue(int *client_sock, q_node_t **head, q_node_t **tail) {
-    q_node_t *temp_tail = *tail;
-    q_node_t *temp_head = *head;
+queue_t *init_queue() {
+    queue_t *ret = (queue_t *)malloc(sizeof(queue_t));
+    ret->head = NULL;
+    ret->tail = NULL;
+    return ret;
+}
+
+void add_to_queue(int *client_sock, queue_t *queue) {
     q_node_t *new_node = (q_node_t *)malloc(sizeof(q_node_t));
     new_node->client_sock = client_sock;
     new_node->next = NULL;
-    if (*tail == NULL) {
-        *head = new_node;
+    if (queue->tail == NULL) {
+        queue->head = new_node;
     }
     else {
-        temp_tail->next = new_node;
-        *tail = temp_tail;
+        queue->tail->next = new_node;
     }
-    *tail = new_node;
-    return 0;
+    queue->tail = new_node;
 }
 
-int *out_of_queue(q_node_t **head, q_node_t **tail) {
-    q_node_t *temp_head = *head;
-    if (*head == NULL) {
+int *out_of_queue(queue_t *queue) {
+    if (queue->head == NULL) {
         return NULL;
     }
     else {
-        int *result = temp_head->client_sock;
-        *head = temp_head->next;
-        if (*head == NULL) {
-            *tail = NULL;
-        }
-        free(temp_head);
+        int *result = queue->head->client_sock;
+        q_node_t *temp = queue->head;
+        queue->head = queue->head->next;
+        if (queue->head == NULL)
+            queue->tail = NULL;
+        else
+            free(temp);
+
         return result;
     }
 }
-

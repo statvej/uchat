@@ -16,7 +16,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-#define THREAD_POOL_SIZE 10
+#define THREAD_POOL_SIZE 1
 #define PORT 8080
 
 
@@ -26,8 +26,18 @@ typedef struct server_init_data_s {
     struct sockaddr_in addr;
 } server_init_data_t;
 
+//Continious loop with threads actions
+void *thread_loop(void *data);
+
+//This function initialases server(used once)
 server_init_data_t init_server(char *ip);
+
+//Continios server loop
 int server_loop(server_init_data_t server_data);
+
+//accepts message using socket file descriptor
 void *accept_message(void *p_socket_fd);
+
+pthread_t *init_thread_pool(int thread_pool_size, void * data);
 
 #endif
