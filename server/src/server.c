@@ -1,19 +1,8 @@
-#include "server.h"
+#include "../inc/server.h"
+#include "../inc/queue.h"
 
-void *accept_message(void *p_socket_fd) {
-    int socket_fd = *(int *)p_socket_fd;
-    free(p_socket_fd);
-    char *buffer = (char *)malloc(sizeof(char) * 1024);
-    read(socket_fd, buffer, 1024);
-    printf("%s\n", buffer);
-    return (void *)buffer;
-}
 
-int main(int argc, char const *argv[]) {
-    server_init_data_t server_data = init_server((char *)argv[1]);
-    server_loop(server_data);
-    return 0;
-}
+
 // void init_queue(q_node_t ** head, q_node_t ** tail){
 
 // }
@@ -79,35 +68,11 @@ int server_loop(server_init_data_t server_data) {
     }
 }
 
-int add_to_queue(int *client_sock, q_node_t **head, q_node_t **tail) {
-    q_node_t *temp_tail = *tail;
-    q_node_t *temp_head = *head;
-    q_node_t *new_node = (q_node_t *)malloc(sizeof(q_node_t));
-    new_node->client_sock = client_sock;
-    new_node->next = NULL;
-    if (*tail == NULL) {
-        *head = new_node;
-    }
-    else {
-        temp_tail->next = new_node;
-        *tail = temp_tail;
-    }
-    *tail = new_node;
-    return 0;
-}
-
-int *out_of_queue(q_node_t **head, q_node_t **tail) {
-    q_node_t *temp_head = *head;
-    if (*head == NULL) {
-        return NULL;
-    }
-    else {
-        int *result = temp_head->client_sock;
-        *head = temp_head->next;
-        if (*head == NULL) {
-            *tail = NULL;
-        }
-        free(temp_head);
-        return result;
-    }
+void *accept_message(void *p_socket_fd) {
+    int socket_fd = *(int *)p_socket_fd;
+    free(p_socket_fd);
+    char *buffer = (char *)malloc(sizeof(char) * 1024);
+    read(socket_fd, buffer, 1024);
+    printf("%s\n", buffer);
+    return (void *)buffer;
 }

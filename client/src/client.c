@@ -1,4 +1,4 @@
-#include "client.h"
+#include "../inc/client.h"
 
 char *read_input() {
     char *buf = (char *)malloc(sizeof(char) * 1024);

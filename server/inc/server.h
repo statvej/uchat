@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef UCHAT_SERVER_H
+#define UCHAT_SERVER_H
 
 #include <unistd.h>
 #include <stdio.h>
@@ -17,10 +19,6 @@
 #define THREAD_POOL_SIZE 10
 #define PORT 8080
 
-typedef struct q_node_s {
-    struct q_node_s *next;
-    int *client_sock;
-} q_node_t;
 
 typedef struct server_init_data_s {
     int socket;
@@ -30,3 +28,6 @@ typedef struct server_init_data_s {
 
 server_init_data_t init_server(char *ip);
 int server_loop(server_init_data_t server_data);
+void *accept_message(void *p_socket_fd);
+
+#endif
