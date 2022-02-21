@@ -1,8 +1,10 @@
 #include "../inc/server.h"
 #include "../inc/queue.h"
 
-//pthread_t thread_pool[THREAD_POOL_SIZE];
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; // To fix race conditions
+// To fix race conditions
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; 
+//Improves cpu usage with multiple conections
+pthread_cond_t cond_var = PTHREAD_COND_INITIALIZER;
 
 server_init_data_t init_server(char *ip) {
     server_init_data_t ret;
@@ -62,13 +64,8 @@ int server_loop(server_init_data_t server_data) {
 
         pthread_mutex_lock(&mutex);
         add_to_queue(client_sock, queue);
+        pthread_cond_signal(&cond_var);
         pthread_mutex_unlock(&mutex);
-        // pthread_create(&thread, NULL, accept_message, (void *)client_sock);
-
-        // void *data_packet;
-        // pthread_join(thread, &data_packet);
-        // free(data_packet);
-        // close(new_socket);
     }
 }
 
@@ -79,11 +76,6 @@ pthread_t *init_thread_pool(int thread_pool_size, void *data) {
     }
     return thread_pool;
 }
-// void init_thread_pool_global(void *data) {
-//     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
-//         pthread_create(&thread_pool[i], NULL, thread_loop, data);
-//     }
-// }
 
 void *accept_message(void *p_socket_fd) {
     int socket_fd = *(int *)p_socket_fd;
@@ -102,7 +94,11 @@ void *thread_loop(void *data) {
     while (true) {
         pthread_mutex_lock(&mutex);
         int *p_client;
-        p_client = out_of_queue(queue);
+        if((p_client = out_of_queue(queue)) == NULL){
+            pthread_cond_wait(&cond_var, &mutex);
+            p_client = out_of_queue(queue);
+        }
+        
         pthread_mutex_unlock(&mutex);
         if (p_client != NULL) {
             accept_message(p_client);
