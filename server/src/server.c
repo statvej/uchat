@@ -1,6 +1,9 @@
 #include "../inc/server.h"
 #include "../inc/queue.h"
 
+//pthread_t thread_pool[THREAD_POOL_SIZE];
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; // To fix race conditions
+
 server_init_data_t init_server(char *ip) {
     server_init_data_t ret;
     struct sockaddr_in address;
@@ -43,6 +46,8 @@ int server_loop(server_init_data_t server_data) {
     // Thread pool init
     pthread_t *thread_pool = init_thread_pool(THREAD_POOL_SIZE, (void *)queue);
 
+    // initialising other variables
+
     int new_socket;
     // loop that handles multiple conections
     while (true) {
@@ -54,16 +59,31 @@ int server_loop(server_init_data_t server_data) {
         }
         int *client_sock = malloc(sizeof(int));
         *client_sock = new_socket;
-        add_to_queue(client_sock, queue);
 
+        pthread_mutex_lock(&mutex);
+        add_to_queue(client_sock, queue);
+        pthread_mutex_unlock(&mutex);
         // pthread_create(&thread, NULL, accept_message, (void *)client_sock);
 
         // void *data_packet;
         // pthread_join(thread, &data_packet);
         // free(data_packet);
-        close(new_socket);
+        // close(new_socket);
     }
 }
+
+pthread_t *init_thread_pool(int thread_pool_size, void *data) {
+    pthread_t *thread_pool = (pthread_t *)malloc(sizeof(pthread_t) * thread_pool_size);
+    for (int i = 0; i < thread_pool_size; i++) {
+        pthread_create(&thread_pool[i], NULL, thread_loop, data);
+    }
+    return thread_pool;
+}
+// void init_thread_pool_global(void *data) {
+//     for (int i = 0; i < THREAD_POOL_SIZE; i++) {
+//         pthread_create(&thread_pool[i], NULL, thread_loop, data);
+//     }
+// }
 
 void *accept_message(void *p_socket_fd) {
     int socket_fd = *(int *)p_socket_fd;
@@ -72,21 +92,18 @@ void *accept_message(void *p_socket_fd) {
     if (buffer != NULL) {
         printf("%s\n", buffer);
     }
-    return (void *)buffer;
-}
-
-pthread_t *init_thread_pool(int thread_pool_size, void *data) {
-    pthread_t *ret = (pthread_t *)malloc(sizeof(pthread_t) * thread_pool_size);
-    for (int i = 0; i < thread_pool_size; i++) {
-        pthread_create(&ret[i], NULL, thread_loop, data);
-    }
-    return ret;
+    close(socket_fd);
+    free(buffer);
+    return NULL;
 }
 
 void *thread_loop(void *data) {
     queue_t *queue = (queue_t *)data;
     while (true) {
-        int *p_client = out_of_queue(queue);
+        pthread_mutex_lock(&mutex);
+        int *p_client;
+        p_client = out_of_queue(queue);
+        pthread_mutex_unlock(&mutex);
         if (p_client != NULL) {
             accept_message(p_client);
         }

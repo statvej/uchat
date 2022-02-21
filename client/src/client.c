@@ -45,7 +45,8 @@ int main(int argc, char const *argv[]) {
             printf("\nConnection Failed \n");
             return -1;
         }
-        char *hello = "HELLLLOOOOOOO!!!!!!!!!!!!!!!!!!!!!!!!!!\n";//read_input();
+        // char *hello = "HELLLLOOOOOOO!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+        char * hello = read_input();
         send(sock, hello, strlen(hello), 0);
         //valread = read(sock, buffer, 1024);
         //printf("%s\n", buffer);

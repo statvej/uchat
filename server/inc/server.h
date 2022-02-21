@@ -16,7 +16,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 
-#define THREAD_POOL_SIZE 1
+#define THREAD_POOL_SIZE 20
 #define PORT 8080
 
 
@@ -39,5 +39,6 @@ int server_loop(server_init_data_t server_data);
 void *accept_message(void *p_socket_fd);
 
 pthread_t *init_thread_pool(int thread_pool_size, void * data);
+void init_thread_pool_global(void *data);
 
 #endif
