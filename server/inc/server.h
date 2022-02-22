@@ -15,9 +15,11 @@
 #include <sqlite3.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define THREAD_POOL_SIZE 20
 #define PORT 8080
+#define INVALID_IP "IP address in invalid\n"
 
 
 typedef struct server_init_data_s {
@@ -40,5 +42,8 @@ void *accept_message(void *p_socket_fd);
 
 pthread_t *init_thread_pool(int thread_pool_size, void * data);
 void init_thread_pool_global(void *data);
+
+int validate_number(char *str);
+void validate_ip(char *ip);
 
 #endif

@@ -2,11 +2,13 @@
 #include "../inc/queue.h"
 
 // To fix race conditions
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; 
-//Improves cpu usage with multiple conections
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+// Improves cpu usage with multiple conections
 pthread_cond_t cond_var = PTHREAD_COND_INITIALIZER;
 
 server_init_data_t init_server(char *ip) {
+    validate_ip(ip); // check if is valid
+
     server_init_data_t ret;
     struct sockaddr_in address;
 
@@ -94,14 +96,71 @@ void *thread_loop(void *data) {
     while (true) {
         pthread_mutex_lock(&mutex);
         int *p_client;
-        if((p_client = out_of_queue(queue)) == NULL){
+        if ((p_client = out_of_queue(queue)) == NULL) {
             pthread_cond_wait(&cond_var, &mutex);
             p_client = out_of_queue(queue);
         }
-        
+
         pthread_mutex_unlock(&mutex);
         if (p_client != NULL) {
             accept_message(p_client);
         }
+    }
+}
+
+/*  validator.c  */
+void validate_ip(char *str) {
+    int segs = 0;  /* Segment count. */
+    int chcnt = 0; /* Character count within segment. */
+    int accum = 0; /* Accumulator for segment. */
+
+    /* Catch NULL pointer. */
+
+    if (str == NULL) {
+        fprintf(stderr, INVALID_IP);
+        exit(EXIT_FAILURE);
+    }
+    /* Process every character in string. */
+    while (*str != '\0') {
+        /* Segment changeover. */
+        if (*str == '.') {
+            /* Must have some digits in segment. */
+            if (chcnt == 0) {
+                fprintf(stderr, INVALID_IP);
+                exit(EXIT_FAILURE);
+            }
+            /* Limit number of segments. */
+            if (++segs == 4) {
+                fprintf(stderr, INVALID_IP);
+                exit(EXIT_FAILURE);
+            }
+            /* Reset segment values and restart loop. */
+            chcnt = accum = 0;
+            str++;
+            continue;
+        }
+        /* Check numeric. */
+        if ((*str < '0') || (*str > '9')) {
+            fprintf(stderr, INVALID_IP);
+            exit(EXIT_FAILURE);
+        }
+        /* Accumulate and check segment. */
+        if ((accum = accum * 10 + *str - '0') > 255) {
+            fprintf(stderr, INVALID_IP);
+            exit(EXIT_FAILURE);
+        }
+        /* Advance other segment specific stuff and continue loop. */
+        chcnt++;
+        str++;
+    }
+    /* Check enough segments and enough characters in last segment. */
+    if (segs != 3) {
+        fprintf(stderr, INVALID_IP);
+        exit(EXIT_FAILURE);
+    }
+
+    if (chcnt == 0) {
+        fprintf(stderr, INVALID_IP);
+        exit(EXIT_FAILURE);
     }
 }
