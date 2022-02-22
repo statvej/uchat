@@ -35,7 +35,7 @@ server_init_data_t init_server(char *ip) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
-
+    printf("Server successfuly created\nPort is %d\n", PORT);
     ret.sock_len = sizeof(address);
     ret.socket = server_fd;
     ret.addr = address;
