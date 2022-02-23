@@ -1,2 +1,2 @@
 all:
-	clang -o uchat -lpthread src/client.c 
+	gcc  -lpthread src/client.c ../libs/cJSON/cJSON.c -o uchat

@@ -45,5 +45,7 @@ void init_thread_pool_global(void *data);
 
 int validate_number(char *str);
 void validate_ip(char *ip);
+char * get_current_time(void);
+
 
 #endif

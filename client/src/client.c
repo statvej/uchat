@@ -1,4 +1,8 @@
 #include "../inc/client.h"
+#include "../../libs/cJSON/cJSON.h"
+
+int u_id = 91345228;
+char* u_name = "Fedia";
 
 char *read_input() {
     char *buf = (char *)malloc(sizeof(char) * 1024);
@@ -21,7 +25,17 @@ char *read_input() {
 
     return buf;
 }
+char * parse_msg_to_json(char * msg){
+    cJSON * message = cJSON_CreateObject();
 
+    cJSON_AddStringToObject(message, "message_text", msg);
+    free(msg);
+    cJSON_AddNumberToObject(message, "user_id", u_id);
+    cJSON_AddStringToObject(message, "user_name", u_name);
+    char * ret = cJSON_Print(message);
+    cJSON_free(message);
+    return ret;
+}
 int main(int argc, char const *argv[]) {
     while (true) {
         int sock = 0;
@@ -45,11 +59,10 @@ int main(int argc, char const *argv[]) {
             printf("\nConnection Failed \n");
             return -1;
         }
-        // char *hello = "HELLLLOOOOOOO!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
         char * hello = read_input();
+        hello = parse_msg_to_json(hello);
         send(sock, hello, strlen(hello), 0);
-        //valread = read(sock, buffer, 1024);
-        //printf("%s\n", buffer);
+
         close(sock);
     }
     return 0;

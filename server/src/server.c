@@ -1,5 +1,6 @@
 #include "../inc/server.h"
 #include "../inc/queue.h"
+#include "../../libs/cJSON/cJSON.h"
 
 // To fix race conditions
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -83,13 +84,26 @@ void *accept_message(void *p_socket_fd) {
     int socket_fd = *(int *)p_socket_fd;
     char *buffer = (char *)malloc(sizeof(char) * 1024);
     read(socket_fd, buffer, 1024);
-    if (buffer != NULL) {
-        printf("%s\n", buffer);
-    }
+    // if (buffer != NULL) {
+    //     printf("%s\n", buffer);
+    // }
     close(socket_fd);
+    cJSON * message = cJSON_Parse(buffer);
     free(buffer);
+    cJSON_AddStringToObject(message, "time", get_current_time());
+
+    printf("%s", cJSON_Print(message));
+
     return NULL;
 }
+
+
+char * get_current_time(void){
+    time_t t_cur;
+    time(&t_cur);
+    return ctime(&t_cur);
+}
+
 
 void *thread_loop(void *data) {
     queue_t *queue = (queue_t *)data;
@@ -109,6 +123,8 @@ void *thread_loop(void *data) {
 }
 
 /*  validator.c  */
+
+
 void validate_ip(char *str) {
     int segs = 0;  /* Segment count. */
     int chcnt = 0; /* Character count within segment. */
@@ -164,3 +180,7 @@ void validate_ip(char *str) {
         exit(EXIT_FAILURE);
     }
 }
+
+/*  validator.c  */
+
+
