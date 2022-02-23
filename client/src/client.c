@@ -38,9 +38,9 @@ char * parse_msg_to_json(char * msg){
 }
 int main(int argc, char const *argv[]) {
     while (true) {
+        argc++;
         int sock = 0;
         struct sockaddr_in serv_addr;
-        char buffer[1024] = {0};
         if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
             printf("\n Socket creation error \n");
             return -1;
