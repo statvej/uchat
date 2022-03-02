@@ -1,6 +1,5 @@
 #include "../inc/server.h"
 #include "../inc/queue.h"
-#include "../../libs/cJSON/cJSON.h"
 
 // To fix race conditions
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;

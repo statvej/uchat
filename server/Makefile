@@ -1,9 +1,9 @@
-HEADERS=inc
 OBJ=obj
 FILES=src
 NAME=uchat_server
 PROFALAGS=-g -Wall
-FLAGS=$(PROFALAGS) -I $(HEADERS)
+LIB_PATH=-L../libs/lib -lcjson
+FLAGS=$(PROFALAGS) -Iinc -I../libs/inc $(LIB_PATH)
 CC=gcc
 OBJS=$(patsubst $(FILES)/%.c, $(OBJ)/%.o, $(ALL_CFILES))
 ALL_CFILES=$(wildcard $(FILES)/*.c)
@@ -27,3 +27,4 @@ clean:
 
 uninstall: clean
 	rm -f $(NAME)
+	

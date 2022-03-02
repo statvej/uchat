@@ -1,10 +1,9 @@
-HEADERS=inc
-MAIN_DIR=
 OBJ=obj
 FILES=src
 NAME=uchat
 PROFALAGS=-g -Wall
-FLAGS=$(PROFALAGS) -I $(HEADERS)
+LIB_PATH=-L../libs/lib -lcjson
+FLAGS=$(PROFALAGS) -Iinc -I../libs/inc $(LIB_PATH)
 CC=gcc
 OBJS=$(patsubst $(FILES)/%.c, $(OBJ)/%.o, $(ALL_CFILES))
 ALL_CFILES=$(wildcard $(FILES)/*.c)

@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include "cJSON.h"
 
 #define THREAD_POOL_SIZE 20
 #define PORT 8080
