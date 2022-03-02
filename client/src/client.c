@@ -1,5 +1,4 @@
 #include "../inc/client.h"
-#include "../../libs/cJSON/cJSON.h"
 
 int u_id = 91345228;
 char* u_name = "Fedia";
