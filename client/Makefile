@@ -19,6 +19,7 @@ $(OBJ)/%.o: $(FILES)/%.c $(OBJ)
 
 $(NAME): $(OBJ) $(OBJS)
 	$(CC) $(FLAGS) $(OBJS) -o $@
+	mv $@ ../
 
 reinstall: uninstall all
 
