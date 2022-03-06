@@ -16,7 +16,6 @@ all: static
 static: $(CJSON_STATIC)
 
 $(CJSON_STATIC): $(CJSON_OBJ)
-	@#mkdir ../inc ../lib
 	@cp cJSON.h ../inc/
 	@$(AR) rcs $@ $<
 
